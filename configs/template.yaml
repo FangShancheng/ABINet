@@ -1,0 +1,67 @@
+global:
+  name: exp
+  phase: train
+  stage: pretrain-vision
+  workdir: /tmp/workdir
+  seed: ~
+ 
+dataset:
+  train: {
+    roots: ['data/training/MJ/MJ_train/', 
+            'data/training/MJ/MJ_test/', 
+            'data/training/MJ/MJ_valid/', 
+            'data/training/ST'],
+    batch_size: 128
+  }
+  test: {
+    roots: ['data/evaluation/IIIT5k_3000', 
+            'data/evaluation/SVT', 
+            'data/evaluation/SVTP',
+            'data/evaluation/IC13_857',
+            'data/evaluation/IC15_1811',
+            'data/evaluation/CUTE80'],
+    batch_size: 128
+  }
+  charset_path: data/charset_36.txt
+  num_workers: 4
+  max_length: 25  # 30
+  image_height: 32
+  image_width: 128
+  case_sensitive: False
+  eval_case_sensitive: False
+  data_aug: True
+  multiscales: False
+  pin_memory: True
+  smooth_label: False
+  smooth_factor: 0.1
+  one_hot_y: True
+  use_sm: False
+
+training:
+  epochs: 6
+  show_iters: 50
+  eval_iters: 3000
+  save_iters: 20000
+  start_iters: 0
+  stats_iters: 100000
+
+optimizer:
+  type: Adadelta # Adadelta, Adam
+  true_wd: False
+  wd: 0. # 0.001
+  bn_wd: False
+  args: {
+    # betas: !!python/tuple [0.9, 0.99], # betas=(0.9,0.99) for AdamW
+    # betas: !!python/tuple [0.9, 0.999], # for default Adam 
+  }
+  clip_grad: 20
+  lr: [1.0, 1.0, 1.0]  # lr: [0.005, 0.005, 0.005]   
+  scheduler: {
+    periods: [3, 2, 1],
+    gamma: 0.1,
+  }
+
+model:
+  name: 'modules.model_abinet.ABINetModel'
+  checkpoint: ~
+  strict: True
