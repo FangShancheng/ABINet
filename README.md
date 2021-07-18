@@ -102,6 +102,18 @@ Additional flags:
 - `--model_eval [alignment|vision]` which sub-model to evaluate
 - `--image_only` disable dumping visualization of attention masks
 
+## Run Demo
+
+```
+python demo.py --config=configs/train_abinet.yaml --input=figs/test
+```
+Additional flags:
+- `--config /path/to/config` set the path of configuration file 
+- `--input /path/to/image-directory` set the path of image directory or wildcard path, e.g, `--input='figs/test/*.png'`
+- `--checkpoint /path/to/checkpoint` set the path of trained model
+- `--cuda [-1|0|1|2|3...]` set the cuda id, by default -1 is set and stands for cpu
+- `--model_eval [alignment|vision]` which sub-model to use
+- `--image_only` disable dumping visualization of attention masks
 
 ## Visualization
 Successful and failure cases on low-quality images:
