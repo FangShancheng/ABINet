@@ -57,8 +57,7 @@ for img_indx in range(start_img_indx, len(image_names)):
             txt_temp = re.sub('[^a-zA-Z]+', '', txt_temp)
             # print('txt_temp-2-',txt_temp)
             if len_now - len(txt_temp) != 0:
-                # print('txt_temp-2-', txt_temp)
-                continue
+                print('txt_temp-2-', txt_temp)
 
             if len(np.shape(mat_contents['wordBB'][0][img_indx])) == 2:  # only one word (2,4)
                 wordBB = mat_contents['wordBB'][0][img_indx]
