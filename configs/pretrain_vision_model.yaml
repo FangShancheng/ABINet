@@ -9,8 +9,8 @@ dataset:
   train: {
     roots: ['data/training/MJ/MJ_train/', 
             'data/training/MJ/MJ_test/', 
-            'data/training/MJ/MJ_valid/', 
-            'data/training/ST'],
+            'data/training/MJ/MJ_valid/'], 
+            #'data/training/ST'],
     batch_size: 384
   }
   test: {
