@@ -11,12 +11,10 @@ ABINet은 LDMB 형식의 데이터를 학습하기 때문에 Raw data를 이에 
 ```
 <br> 
 <br>  
-반면 별도의 annotation 파일은 없고, 이미지 파일이름을 라벨로 하는 데이터셋도 있다.   
+반면 별도의 annotation 파일은 없고, 이미지 파일이름을 라벨로 하는 데이터셋도 있다.<br>   
+
 ```
-./3000/7/181_REMODELERS_64541.jpg 64541
-./3000/7/180_Chronographs_13538.jpg 13538
-./3000/7/179_Impeaching_38222.jpg 38222
-./3000/7/178_discombobulated_22063.jpg 22063
+/home/ubuntu/Dataset/custom/라면.jpg  --> 라면
 ```
 <br>
 이 경우는 `create_lmdb_dataset_var.py`을 실행시키면 된다.
