@@ -22,7 +22,7 @@ class ImageDataset(Dataset):
                  max_length:int=25,
                  check_length:bool=True,
                  case_sensitive:bool=False,
-                 charset_path:str='data/charset_36.txt',
+                 charset_path:str='data/charset_36hangul.txt',
                  convert_mode:str='RGB',
                  data_aug:bool=True,
                  deteriorate_ratio:float=0.,
@@ -96,7 +96,7 @@ class ImageDataset(Dataset):
             image_key, label_key = f'image-{idx+1:09d}', f'label-{idx+1:09d}'
             try:
                 label = str(txn.get(label_key.encode()), 'utf-8')  # label
-                label = re.sub('[^0-9a-zA-Z]+', '', label)
+                label = re.sub('[^0-9a-zA-Zㄱ-ㅎ가-힣]+', '', label)
                 if self.check_length and self.max_length > 0:
                     if len(label) > self.max_length or len(label) <= 0:
                         #logging.info(f'Long or short text image is found: {self.name}, {idx}, {label}, {len(label)}')
@@ -152,7 +152,7 @@ class TextDataset(Dataset):
                  path:PathOrStr, 
                  delimiter:str='\t',
                  max_length:int=25, 
-                 charset_path:str='data/charset_36.txt', 
+                 charset_path:str='data/charset_36hangul.txt', 
                  case_sensitive=False, 
                  one_hot_x=True,
                  one_hot_y=True,
@@ -176,7 +176,7 @@ class TextDataset(Dataset):
 
     def __getitem__(self, idx):
         text_x = self.df.iloc[idx, self.inp_col]
-        text_x = re.sub('[^0-9a-zA-Z]+', '', text_x)
+        text_x = re.sub('[^0-9a-zA-Zㄱ-ㅎ가-힣]+', '', text_x)
         if not self.case_sensitive: text_x = text_x.lower()
         if self.is_training and self.use_sm: text_x = self.sm(text_x)
 
@@ -190,7 +190,7 @@ class TextDataset(Dataset):
         x =  [label_x, length_x]
     
         text_y = self.df.iloc[idx, self.gt_col]
-        text_y = re.sub('[^0-9a-zA-Z]+', '', text_y)
+        text_y = re.sub('[^0-9a-zA-Zㄱ-ㅎ가-힣]+', '', text_y)
         if not self.case_sensitive: text_y = text_y.lower()
         length_y = tensor(len(text_y) + 1).to(dtype=torch.long)  # one for end token
         label_y = self.charset.get_labels(text_y, case_sensitive=self.case_sensitive)
