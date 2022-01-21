@@ -1,4 +1,4 @@
-""" a modified version of CRNN torch repository https://github.com/bgshih/crnn/blob/master/tool/create_dataset.py """
+""" a small modification for MJsynth dataset """
 
 import fire
 import os
@@ -6,23 +6,7 @@ import lmdb
 import cv2
 
 import numpy as np
-
-
-def checkImageIsValid(imageBin):
-    if imageBin is None:
-        return False
-    imageBuf = np.frombuffer(imageBin, dtype=np.uint8)
-    img = cv2.imdecode(imageBuf, cv2.IMREAD_GRAYSCALE)
-    imgH, imgW = img.shape[0], img.shape[1]
-    if imgH * imgW == 0:
-        return False
-    return True
-
-
-def writeCache(env, cache):
-    with env.begin(write=True) as txn:
-        for k, v in cache.items():
-            txn.put(k, v)
+from create_lmdb_dataset import checkImageIsValid, writeCache
 
 
 def createDataset(inputPath, gtFile, outputPath, checkValid=True):
@@ -46,6 +30,7 @@ def createDataset(inputPath, gtFile, outputPath, checkValid=True):
     for i in range(nSamples):
         #imagePath, label = datalist[i].strip('\n').split('\t') 
         imagePath, label = datalist[i].strip('\n').split(' ')
+        label = imagePath.split('_')[-2] # /home/ubuntu/Dataset/text_recognition/Korean/mjsynth/./2425/1/110_savannas_67969.jpg -> savannas
         imagePath = os.path.join(inputPath, imagePath)
 
         # # only use alphanumeric data
