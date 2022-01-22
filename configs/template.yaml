@@ -22,7 +22,7 @@ dataset:
             'data/evaluation/CUTE80'],
     batch_size: 128
   }
-  charset_path: data/charset_36.txt
+  charset_path: data/charset_36hangul.txt
   num_workers: 4
   max_length: 25  # 30
   image_height: 32
