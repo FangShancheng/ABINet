@@ -14,6 +14,7 @@ from dataset import ImageDataset, TextDataset
 from losses import MultiLosses
 from utils import Config, Logger, MyDataParallel, MyConcatDataset
 
+os.environ["CUDA_VISIBLE_DEVICES"]="0,1"
 
 def _set_random_seed(seed):
     if seed is not None:
@@ -221,7 +222,7 @@ def main():
 
     logging.info('Construct dataset.')
     if config.global_stage == 'pretrain-language': data = _get_language_databaunch(config)
-    else: data = _get_databaunch(config)
+    else: data = _get_databaunch(config)    
 
     logging.info('Construct model.')
     model = _get_model(config)
