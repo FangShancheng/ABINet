@@ -3,43 +3,30 @@
 import fire
 import os
 import lmdb
-import cv2
-import re
 
-import numpy as np
+import re
+import json
+
 from glob import glob
 from create_lmdb_dataset import checkImageIsValid, writeCache
+from create_lmdb_dataset_var import get_hangul
+
+from typing import List, Dict
+from functools import singledispatch
 
 
-def get_hangul(inputLabel):
-    '''transform hangul character into 3 syllables
-    Args :
-        inputLabel : str
-    Return :
-        자모 분리해서 합친 뒤 공백(종성이 없는 경우)을 제거 : str
-    '''
-    base_unicode, initial_unicode, medium_unicode = 44032, 588, 28
-    initial_list = list('ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ')
-    medium_list = list('ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ')
-    terminal_list = list(' ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ') # 종성이 없는 경우도 있으므로 공백이 필요하다
-    labelList = list(inputLabel)
-    split_result = []
-    for keyword in labelList:
-        if re.match('.*[가-힣]+.*', keyword) is not None:
-            # 초성
-            char_code = ord(keyword) - base_unicode
-            init_char = int(char_code/initial_unicode)
-            split_result.append(initial_list[init_char])
-            # 중성
-            med_char = int((char_code - (initial_unicode*init_char))/medium_unicode)
-            split_result.append(medium_list[med_char])
-            # 종성
-            term_char = int((char_code - (initial_unicode*init_char)-(medium_unicode*med_char)))
-            split_result.append(terminal_list[term_char])
-        else:
-            split_result.append(keyword)
-    output = "".join(split_result)
-    return output.replace(' ', '')
+@singledispatch
+def get_label(arg):
+    #return arg
+    raise NotImplementedError(f"Cannot format value of type {type(arg)}")
+
+@get_label.register(dict)
+def valueType(arg: Dict) -> str:
+    return arg['value']
+
+@get_label.register(list)
+def valueType(arg: List) -> str:
+    return ''.join([lb['value'] for lb in arg])
 
 
 def createDataset(inputPath, outputPath, checkValid=True):
@@ -55,15 +42,14 @@ def createDataset(inputPath, outputPath, checkValid=True):
     cache = {}
     cnt = 1
     
-    datalist = glob(os.path.join(inputPath, "*.jpg"))  # create a list containing image file path
-    labelList = list(map(lambda x: x.split('/')[-1].replace('.jpg', ''),datalist)) # create a list that contains the label corresponding filePath
-
-
+    datalist = glob(os.path.join(inputPath, "*/*.jpg"))    # create a list containing image file path
+    labelList = glob(os.path.join(inputPath, "*/*.json")) # create a list that contains the label corresponding filePath
+    
     nSamples = len(datalist)
-    for imagePath, label in zip(datalist, labelList):
+    for imagePath, labelPath in zip(datalist, labelList):
         """
-        imagePath label 예시 : /home/ubuntu/Dataset/text_recognition/Korean/public_crop/이해.jpg 이해
-        이해 --> ㅇㅣㅎㅐ
+        label JSON 예시
+        {'info': {'name': 'Korean OCR Data Set', 'description': 'Korean OCR Data Set (letter handwrite)', 'date_created': '2020-12-22 13:39:21', 'text': '각'}, 'image': {'file_name': '00130001002.jpg', 'width': 110, 'height': 110, 'dpi': 300, 'bit': 24}, 'text': {'type': 'letter', 'output': 'handwrite', 'letter': {'value': '각'}}, 'license': {'output': 'handwrite', 'font': '', 'font_no': '', 'font_license': '', 'font_url': '', 'writer_no': '001', 'writer_gender': 'female', 'writer_age': '40'}}
         """
     
         if not os.path.exists(imagePath):
@@ -71,6 +57,19 @@ def createDataset(inputPath, outputPath, checkValid=True):
             continue
         with open(imagePath, 'rb') as f:
             imageBin = f.read()
+            
+        with open(labelPath, "r") as lbl:
+            lbl_dict = json.load(lbl)
+        
+        try:
+            if not lbl_dict['image']['file_name'] == imagePath.split('/')[-1] :
+                print(lbl_dict['image']['file_name'], " does not match the corresponding image file name ", imagePath.split('/')[-1])
+                continue
+                
+        except KeyError as ke:
+            print(ke)
+            continue
+            
         if checkValid:
             try:
                 if not checkImageIsValid(imageBin):
@@ -81,6 +80,8 @@ def createDataset(inputPath, outputPath, checkValid=True):
                 with open(outputPath + '/error_image_log.txt', 'a') as log:
                     log.write('%s-th image data occured error\n' % str(i))
                 continue
+        
+        label = get_label(lbl_dict['text'][lbl_dict['text']['type']])
         label = get_hangul(label)
 
         imageKey = 'image-%09d'.encode() % cnt
