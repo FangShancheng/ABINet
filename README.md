@@ -102,6 +102,10 @@ Additional flags:
 - `--model_eval [alignment|vision]` which sub-model to evaluate
 - `--image_only` disable dumping visualization of attention masks
 
+## Web Demo
+
+Integrated into [Huggingface Spaces 🤗](https://huggingface.co/spaces) using [Gradio](https://github.com/gradio-app/gradio). Try out the Web Demo: [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/tomofi/ABINet-OCR)
+
 ## Run Demo
 
 ```
