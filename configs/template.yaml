@@ -2,7 +2,7 @@ global:
   name: exp
   phase: train
   stage: pretrain-vision
-  workdir: /tmp/workdir
+  workdir: /home/ubuntu/SharedForMultiNodes/ABINet/pretrain-vision-model
   seed: ~
  
 dataset:
@@ -22,7 +22,7 @@ dataset:
             'data/evaluation/CUTE80'],
     batch_size: 128
   }
-  charset_path: data/charset_36hangul.txt
+  charset_path: /home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/charset_36hangul.txt
   num_workers: 4
   max_length: 25  # 30
   image_height: 32
