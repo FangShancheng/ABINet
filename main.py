@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 import random
-
+from torch.multiprocessing import Process
 import torch
 from fastai.callbacks.general_sched import GeneralScheduler, TrainingPhase
 from fastai.distributed import *
@@ -256,6 +256,8 @@ def main():
                   f'ted = {last_metrics[3]:6.3f},  ned = {last_metrics[4]:6.0f},  ' \
                   f'ted/w = {last_metrics[5]:6.3f}, '
         logging.info(log_str)
-
+        
+       
+        
 if __name__ == '__main__':
     main()
