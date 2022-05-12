@@ -14,7 +14,6 @@ from dataset import ImageDataset, TextDataset
 from losses import MultiLosses
 from utils import Config, Logger, MyDataParallel, MyConcatDataset
 
-#os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2"
 os.environ["OMP_NUM_THREADS"]="1"
 
 def _set_random_seed(seed):
@@ -216,10 +215,23 @@ def main():
     _set_random_seed(config.global_seed)
     logging.info(config)
 
+    ## --use_env option
+    if 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
+        args.rank = int(os.environ["RANK"])
+        args.world_size = int(os.environ['WORLD_SIZE'])
+        args.local_rank = int(os.environ['LOCAL_RANK'])
+
     if args.local_rank is not None:
-        logging.info(f'Init distribution training at device {args.local_rank}.')
+        if args.rank is not None:
+            logging.info(f'Init distribution training at device {args.rank}.')
+        else:
+            logging.info(f'Init distribution training at device {args.local_rank}.')
         torch.cuda.set_device(args.local_rank)
-        torch.distributed.init_process_group(backend='nccl', init_method='env://')
+        if args.rank is not None:
+            # Multi-node DDP
+            torch.distributed.init_process_group(backend='nccl', init_method='env://', rank = args.rank, world_size=args.world_size)
+        else:
+            torch.distributed.init_process_group(backend='nccl', init_method='env://')
 
     logging.info('Construct dataset.')
     if config.global_stage == 'pretrain-language': data = _get_language_databaunch(config)
@@ -233,6 +245,7 @@ def main():
 
     if config.global_phase == 'train':
         logging.info('Start training.')
+        #torch.distributed.barrier()
         learner.fit(epochs=config.training_epochs,
                     lr=config.optimizer_lr)
     else:

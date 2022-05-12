@@ -2,25 +2,25 @@ global:
   name: pretrain-vision-model
   phase: train
   stage: pretrain-vision
-  workdir: workdir
+  workdir: /home/ubuntu/SharedForMultiNodes/ABINet
   seed: ~
  
 dataset:
   train: {
-    roots: ['data/training/MJ/MJ_train/', 
-            'data/training/MJ/MJ_test/', 
-            'data/training/MJ/MJ_valid/'], 
+    roots: ['/home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/training/MJ/MJ_train/', 
+            '/home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/training/MJ/MJ_test/', 
+            '/home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/training/MJ/MJ_valid/'], 
             #'data/training/ST'],
-    batch_size: 576
+    batch_size: 240 #576
   }
   test: {
-    roots: ['data/evaluation/IIIT5k_3000', 
-            'data/evaluation/SVT', 
-            'data/evaluation/SVTP',
-            'data/evaluation/IC13_857',
-            'data/evaluation/IC15_1811',
-            'data/evaluation/CUTE80'],
-    batch_size: 576
+    roots: ['/home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/evaluation/IIIT5k_3000', 
+            '/home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/evaluation/SVT', 
+            '/home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/evaluation/SVTP',
+            '/home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/evaluation/IC13_857',
+            '/home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/evaluation/IC15_1811',
+            '/home/ubuntu/SharedForMultiNodes/Dataset/ABINet_dataset/evaluation/CUTE80'],
+    batch_size: 240 #576
   }
   data_aug: True
   multiscales: False
