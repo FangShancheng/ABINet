@@ -78,4 +78,68 @@ Annotation이 JSON 형식인 경우에도, 적용할 수 있다. 대표적으로
   "writer_age": "40"}}
 ```  
 
-이러한 형태의 JSON에서 원하는 GT 문자열을 추출해내서 lmdb로 변환하는 코드는 <code>create_lmdb_dataset_AI_Hub.py</code>이다.
+이러한 형태의 JSON에서 원하는 GT 문자열을 추출해내서 lmdb로 변환하는 코드는 <code>create_lmdb_dataset_AI_Hub.py</code>이다.<br>
+  
+  
+KoreanSTR 데이터셋 <a href=https://aihub.or.kr/aidata/133> 역시 JSON 형태로 annotation이 되어 있는데 JSON의 mapping 형태가 조금 다르다.<br>
+annotation file인 handwriting_data_info1.json 파일의 형식은 다음과 같고
+
+```bash
+{'info':    , 
+ 'images': [...{'id': '00000003',
+             'width': 3739,
+             'height': 175,
+             'file_name': '00000003.png',
+             'license': 'AI 오픈 이노베이션 허브'},
+            ...], 
+ 'annotations': [...{'id': '00000003',
+                  'image_id': '00000003',
+                  'text': '정권자였는데 이에 대한 사과가 우선"이라고 했다. 한편 문 후보와 김',
+                  'attributes': {'type': '문장', 'gender': '여', 'age': '28', 'job': '직장인'}},
+              ...], 
+ 'licenses': }
+```
+
+`images`에 이미지 파일에 관한 정보, `annotations`에 annotation에 관한 정보가 각각 dict들의 list 형태로 맵핑되어 있음을 알 수 있다. 그리고 `annotations`의 `image_id`가 `images`의 `id`에 해당하는 일종의 외래키 역할을 하기 때문에, `image_id`를 매개로 annotation 정보와 이미지 파일을 pairing할 수 있다.
+
+lmdb로 변환하기 위한 도커 컨테이너 환경
+
+```bash
+docker pull seonwhee0docker/abinet:torch1.12
+docker run -it --name abinet --ipc=host -v /Data1:/Data1 -v /Data2:/Data2 -v $(pwd)/ABINet:/app -p 8881:8888 seonwhee0docker/abinet:torch1.12 /bin/bash
+```
+
+컨테이너에서 jupyter notebook을 실행시키고 8881 포트로 접속한다.  
+
+```bash
+jupyter notebook --ip 0.0.0.0 --allow-root --no-browser
+```
+  
+create_lmdb_dataset_KoreanSTR.py  
+  
+가장 시간이 많이 소요되는 것은 모든 파일을 어노테이션과 비교해가면서 pair를 만드는 `get_all_pairs` 메소드 중 `self.imgName2path_annot`를 실행하는 부분이기 때문에 `total_imgs_file`를 slicing해서 만개(`total_imgs_file[:10000]`)만 문제 없이 실행되는지 확인하고, 문제없으면 전체 이미지 `total_imgs_file`에 대해서 pair를 만들어준다.  
+
+```python
+    def get_all_pairs(self) -> List[Tuple[str, str]]:
+        
+        total_imgs : List[str] # all the paths of available png files
+        total_imgs_file : List[str]  # list of img file names ['00022234.png', '00000011.png', ..]
+        img_annot_pairs : List[Tuple[str, str]] # list of image path - annotation pairs  [('/Data2/Dataset/KoreanSTR/1_syllable/00022234.png', '몜'), ...]
+        
+        total_imgs = []
+        img_annot_pairs = []
+        for folder in list(self.img_dir.values()):
+            total_imgs += glob( root_path + folder + '/*.png')
+            
+        total_imgs_file = list(map(lambda x: x.split('/')[-1], total_imgs))
+        del total_imgs
+        
+        img_annot_pairs += list(map(lambda imgQuery: self.imgName2path_annot(imgQuery), total_imgs_file[:10000]))  ## 실행되는지 확인하기 위해 100개만
+        return img_annot_pairs
+```
+  
+lmdb_dataset 실행 명령  
+
+```bash
+python create_lmdb_dataset_KoreanSTR.py --outputPath='/Data2/Dataset/Preproc/ABINet/'
+```
