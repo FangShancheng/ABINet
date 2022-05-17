@@ -81,7 +81,7 @@ Annotation이 JSON 형식인 경우에도, 적용할 수 있다. 대표적으로
 이러한 형태의 JSON에서 원하는 GT 문자열을 추출해내서 lmdb로 변환하는 코드는 <code>create_lmdb_dataset_AI_Hub.py</code>이다.<br>
   
   
-KoreanSTR 데이터셋 <a href=https://aihub.or.kr/aidata/133> 역시 JSON 형태로 annotation이 되어 있는데 JSON의 mapping 형태가 조금 다르다.<br>
+<a href=https://aihub.or.kr/aidata/133> KoreanSTR 데이터셋 </a> 역시 JSON 형태로 annotation이 되어 있는데 JSON의 mapping 형태가 조금 다르다.<br>
 annotation file인 handwriting_data_info1.json 파일의 형식은 다음과 같고
 
 ```bash
