@@ -1,5 +1,3 @@
-"""A modification of create_lmdb_dataset.py in the case where gt label is the name of the image file"""
-
 import fire
 import os
 import lmdb
@@ -9,6 +7,7 @@ import re
 import numpy as np
 from glob import glob
 from create_lmdb_dataset import checkImageIsValid, writeCache
+from gt_file_check import CheckGT
 
 
 def get_hangul(inputLabel):
@@ -42,11 +41,11 @@ def get_hangul(inputLabel):
     return output.replace(' ', '')
 
 
-def createDataset(inputPath, outputPath, checkValid=True):
+def createDataset(gtPath, outputPath, checkValid=True):
     """
     Create LMDB dataset for training and evaluation.
     ARGS:
-        inputPath  : input folder path where starts imagePath
+        inputPath  : gt file path
         outputPath : LMDB output path        
         checkValid : if true, check the validity of every image
     """
@@ -55,15 +54,13 @@ def createDataset(inputPath, outputPath, checkValid=True):
     cache = {}
     cnt = 1
     
-    datalist = glob(os.path.join(inputPath, "*.jpg"))  # create a list containing image file path
-    labelList = list(map(lambda x: x.split('/')[-1].replace('.jpg', ''),datalist)) # create a list that contains the label corresponding filePath
+    syn_data = CheckGT(gtPath)
 
-
-    nSamples = len(datalist)
-    for imagePath, label in zip(datalist, labelList):
+    nSamples = len(syn_data.file_annot)
+    for imagePath, label in syn_data.file_annot:
         """
-        imagePath label 예시 : /home/ubuntu/Dataset/text_recognition/Korean/public_crop/이해.jpg 이해
-        이해 --> ㅇㅣㅎㅐ
+        imagePath label 예시 : '/Data1/FoodDetection/data/text_recognition/Korean/synthetic_data/data/0.jpg' '풀'
+        풀 --> ㅍㅜㄹ
         """
     
         if not os.path.exists(imagePath):
