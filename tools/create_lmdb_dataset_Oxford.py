@@ -9,11 +9,10 @@ import numpy as np
 from create_lmdb_dataset import checkImageIsValid, writeCache
 
 
-def createDataset(inputPath, gtFile, outputPath, checkValid=True):
+def createDataset(gtFile, outputPath, checkValid=True):
     """
     Create LMDB dataset for training and evaluation.
-    ARGS:
-        inputPath  : input folder path where starts imagePath
+    ARGS:        
         outputPath : LMDB output path
         gtFile     : list of image path and label
         checkValid : if true, check the validity of every image
@@ -29,10 +28,9 @@ def createDataset(inputPath, gtFile, outputPath, checkValid=True):
     nSamples = len(datalist)
     for i in range(nSamples):
         #imagePath, label = datalist[i].strip('\n').split('\t') 
-        imagePath, label = datalist[i].strip('\n').split(' ')
+        imagePath = datalist[i].strip('\n')
         label = imagePath.split('_')[-2] # /home/ubuntu/Dataset/text_recognition/Korean/mjsynth/./2425/1/110_savannas_67969.jpg -> savannas
-        imagePath = os.path.join(inputPath, imagePath)
-
+        
         # # only use alphanumeric data
         # if re.search('[^a-zA-Z0-9]', label):
         #     continue
