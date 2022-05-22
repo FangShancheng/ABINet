@@ -13,7 +13,7 @@ from PIL import Image
 from matplotlib import pyplot as plt
 from glob import glob
 from create_lmdb_dataset import checkImageIsValid, writeCache
-from create_lmdb_dataset_var import get_hangul
+from create_lmdb_dataset_var import get_hangul, full2half
 
 from typing import List, Dict, Tuple
 
@@ -150,6 +150,8 @@ def createDataset(outputPath, checkValid=True):
                 with open(outputPath + '/error_image_log.txt', 'a') as log:
                     log.write('%s-th image data occured error\n' % str(i))
                 continue
+                
+        label = full2half(label)
         label = get_hangul(label)
 
         imageKey = 'image-%09d'.encode() % cnt

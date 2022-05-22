@@ -9,6 +9,15 @@ import re
 import numpy as np
 from glob import glob
 from create_lmdb_dataset import checkImageIsValid, writeCache
+import unicodedata
+
+def full2half(inputTxt: str) -> str:
+    '''
+    inputTxt : possible Full-width unicode
+    outputTxt : change to Half-width unicode
+    '''    
+    outputTxt = unicodedata.normalize('NFKC', inputTxt)
+    return outputTxt
 
 
 def get_hangul(inputLabel):
@@ -81,6 +90,7 @@ def createDataset(inputPath, outputPath, checkValid=True):
                 with open(outputPath + '/error_image_log.txt', 'a') as log:
                     log.write('%s-th image data occured error\n' % str(i))
                 continue
+        label = full2half(label)
         label = get_hangul(label)
 
         imageKey = 'image-%09d'.encode() % cnt
