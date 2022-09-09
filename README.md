@@ -13,7 +13,7 @@ ABINet uses a vision model and an explicit language model to recognize text in t
 - Running in Docker
     ```
     $ git@github.com:FangShancheng/ABINet.git
-    $ docker run --gpus all --rm -ti --ipc=host -v $(pwd)/ABINet:/app fangshancheng/fastai:torch1.1 /bin/bash
+    $ docker run --gpus all --rm -ti --ipc=host -v "$(pwd)"/ABINet:/app fangshancheng/fastai:torch1.1 /bin/bash
     ```
 - (Untested) Or using the dependencies
     ```
