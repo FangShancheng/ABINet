@@ -15,6 +15,7 @@ class ABINetIterModel(nn.Module):
         self.vision = BaseVision(config)
         self.language = BCNLanguage(config)
         self.alignment = BaseAlignment(config)
+        self.export = config.export
 
     def forward(self, images, *args):
         v_res = self.vision(images)
@@ -28,6 +29,8 @@ class ABINetIterModel(nn.Module):
             all_l_res.append(l_res)
             a_res = self.alignment(l_res['feature'], v_res['feature'])
             all_a_res.append(a_res)
+        if self.export:
+            return a_res['logits'], a_res['pt_lengths']
         if self.training:
             return all_a_res, all_l_res, v_res
         else:

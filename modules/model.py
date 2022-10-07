@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 from utils import CharsetMapper
 
@@ -13,7 +14,7 @@ class Model(nn.Module):
         super().__init__()
         self.max_length = config.dataset_max_length + 1
         self.charset = CharsetMapper(config.dataset_charset_path, max_length=self.max_length)
-    
+
     def load(self, source, device=None, strict=True):
         state = torch.load(source, map_location=device)
         self.load_state_dict(state['model'], strict=strict)
@@ -21,10 +22,7 @@ class Model(nn.Module):
     def _get_length(self, logit, dim=-1):
         """ Greed decoder to obtain length from logit"""
         out = (logit.argmax(dim=-1) == self.charset.null_label)
-        abn = out.any(dim)
-        out = ((out.cumsum(dim) == 1) & out).max(dim)[1]
-        out = out + 1  # additional end token
-        out = torch.where(abn, out, out.new_tensor(logit.shape[1]))
+        out = (out.int() == 0).sum(dim=dim)
         return out
 
     @staticmethod
