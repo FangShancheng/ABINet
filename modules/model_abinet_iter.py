@@ -1,5 +1,5 @@
 import torch
-import torch.nn as nn
+import torch.nn.functional as F
 from fastai.vision import *
 
 from .model_vision import BaseVision
@@ -30,7 +30,7 @@ class ABINetIterModel(nn.Module):
             a_res = self.alignment(l_res['feature'], v_res['feature'])
             all_a_res.append(a_res)
         if self.export:
-            return a_res['logits'], a_res['pt_lengths']
+            return F.softmax(a_res['logits'], dim=2), a_res['pt_lengths']
         if self.training:
             return all_a_res, all_l_res, v_res
         else:

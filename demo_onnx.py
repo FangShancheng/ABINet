@@ -13,7 +13,6 @@ from torch.nn import functional as F
 from typing import *
 import tqdm
 
-
 sess = onnxruntime.InferenceSession('abinet.onnx', providers=['CUDAExecutionProvider'])
 
 charset = CharsetMapper(filename='data/charset_vn.txt',
@@ -64,21 +63,22 @@ def preprocess(img, width, height):
     img = cv2.resize(np.array(img), (width, height))
     img = transforms.ToTensor()(img).unsqueeze(0)
     mean = torch.tensor([0.485, 0.456, 0.406])
-    std  = torch.tensor([0.229, 0.224, 0.225])
-    return (img-mean[...,None,None]) / std[...,None,None]
+    std = torch.tensor([0.229, 0.224, 0.225])
+    return (img - mean[..., None, None]) / std[..., None, None]
 
-imgs = r'E:\text_recognize_data\syntext_word\synth_test'
+
+imgs = r'E:\text_recognize_data\syntext_line'
 
 # cv2.namedWindow('cc', cv2.WINDOW_NORMAL)
 
-with open(r'E:\text_recognize_data\syntext_word\synth_test\gt.txt', 'r', encoding='utf8') as f:
+with open(r'E:\text_recognize_data\syntext_line\anno_real.txt', 'r', encoding='utf8') as f:
     data = f.readlines()
 metric = WordAccuary()
 
-
-for i in tqdm.tqdm(data[:4000]):
+# for i in tqdm.tqdm(data[:4000]):
+for i in data:
     img_path, text = i.strip().split('\t')
-    image = cv2.imread(imgs + f'/{img_path}')
+    image = cv2.imread(imgs + f'/{img_path}')[:, :, ::-1]
     image = preprocess(image, 128, 32)
     image = image.cpu().numpy()
 
@@ -90,7 +90,7 @@ for i in tqdm.tqdm(data[:4000]):
 
     pt_text, pt_scores, pt_lengths = _decode(torch.from_numpy(logits))
     metric.update(pt_text[0], text)
-    # print(text, pt_text[0])
+    print(text, pt_text[0])
     # break
 
 print(metric.compute())
