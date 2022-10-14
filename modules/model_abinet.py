@@ -1,10 +1,8 @@
-import torch
-import torch.nn as nn
 from fastai.vision import *
 
-from .model_vision import BaseVision
-from .model_language import BCNLanguage
 from .model_alignment import BaseAlignment
+from .model_language import BCNLanguage
+from .model_vision import BaseVision
 
 
 class ABINetModel(nn.Module):

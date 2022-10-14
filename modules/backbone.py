@@ -1,5 +1,3 @@
-import torch
-import torch.nn as nn
 from fastai.vision import *
 
 from modules.model import _default_tfmer_cfg
